@@ -124,7 +124,7 @@ pub fn toml_config(_attr: TokenStream, item: TokenStream) -> TokenStream {
         load_crate_cfg(&c)
     });
     let cfg = maybe_cfg
-        .expect(&format!("cfg.toml not found in {:?}", root_path));
+        .expect(&format!("cfg.toml not found in {:?}", cfg_path));
 
     let mut struct_defn_fields = TokenStream2::new();
     let mut struct_inst_fields = TokenStream2::new();
