@@ -112,12 +112,6 @@ pub fn toml_config(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let struct_defn = syn::parse::<syn::ItemStruct>(item)
         .expect("Failed to parse configuration structure!");
 
-    let require_cfg_present = if let Ok(val) = env::var("TOML_CFG") {
-        val.contains("require_cfg_present")
-    } else {
-        false
-    };
-
     let root_path = find_root_path();
     let cfg_path = root_path.clone();
     let cfg_path = cfg_path.as_ref().and_then(|c| {
@@ -129,12 +123,8 @@ pub fn toml_config(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let maybe_cfg = cfg_path.as_ref().and_then(|c| {
         load_crate_cfg(&c)
     });
-    let got_cfg = maybe_cfg.is_some();
-    if require_cfg_present {
-        assert!(got_cfg, "TOML_CFG=require_cfg_present set, but valid config not found!")
-    }
     let cfg = maybe_cfg
-        .unwrap_or_else(|| Defn::default());
+        .expect(format!("cfg.toml not found in {}", root_path.map(|p|p.display())));
 
     let mut struct_defn_fields = TokenStream2::new();
     let mut struct_inst_fields = TokenStream2::new();
